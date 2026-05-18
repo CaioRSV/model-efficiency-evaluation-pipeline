@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -24,6 +25,16 @@ jobs:
 
       - name: Run threshold evaluation unit tests
         run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Install and Start Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve &
+          sleep 5
+          ollama pull qwen:0.5b
+
+      - name: Run Actual Model Evaluation
+        run: python ci/run_evaluation.py
 
       - name: Enforce LLM metric thresholds
         run: python ci/evaluate_metrics.py --thresholds ci/thresholds.json --metrics ci/latest_metrics.json

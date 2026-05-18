@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -78,9 +79,30 @@ def main() -> int:
         print("Model efficiency gate failed:")
         for violation in violations:
             print(f"- {violation}")
+            
+        summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_file:
+            with open(summary_file, "a", encoding="utf-8") as f:
+                f.write("## ❌ Model Efficiency Gate Failed\n\n")
+                f.write("| Metric | Value |\n|---|---|\n")
+                for m, v in metrics.items():
+                    f.write(f"| {m} | {v} |\n")
+                f.write("\n**Violations:**\n")
+                for v in violations:
+                    f.write(f"- {v}\n")
+                    
         return 1
 
     print("Model efficiency gate passed.")
+    
+    summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_file:
+        with open(summary_file, "a", encoding="utf-8") as f:
+            f.write("## ✅ Model Efficiency Gate Passed\n\n")
+            f.write("| Metric | Value |\n|---|---|\n")
+            for m, v in metrics.items():
+                f.write(f"| {m} | {v} |\n")
+                
     return 0
 
 
