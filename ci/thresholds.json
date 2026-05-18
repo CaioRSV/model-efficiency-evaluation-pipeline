@@ -1,0 +1,11 @@
+{
+  "accuracy": {
+    "min": 0.85
+  },
+  "latency_ms": {
+    "max": 1200
+  },
+  "cost_usd": {
+    "max": 0.02
+  }
+}
