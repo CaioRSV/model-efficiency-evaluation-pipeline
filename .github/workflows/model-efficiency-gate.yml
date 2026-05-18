@@ -1,0 +1,27 @@
+name: Model Efficiency Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  model-efficiency-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run threshold evaluation unit tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Enforce LLM metric thresholds
+        run: python ci/evaluate_metrics.py --thresholds ci/thresholds.json --metrics ci/latest_metrics.json
